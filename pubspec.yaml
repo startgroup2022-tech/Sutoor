@@ -1,105 +1,28 @@
 
-workflows:
-  android-test:
-    name: "Sutoor Android - Test APK"
-    max_build_duration: 60
-    instance_type: mac_mini_m2
+name: sutoor
+description: "Sutoor Digital Library - تطبيق سطور للمكتبة الرقمية"
+publish_to: 'none'
 
-    environment:
-      flutter: stable
-      vars:
-        PACKAGE_ID: "com.sutoor.library"
-        API_URL: "https://sutoor.it.com/api/v1"
+version: 0.1.0+1
 
-    scripts:
-      - name: "Generate Android project"
-        script: |
-          flutter create --platforms=android --org com.sutoor --project-name sutoor .
+environment:
+  sdk: '>=3.3.0 <4.0.0'
 
-      - name: "Install dependencies"
-        script: |
-          flutter pub get
+dependencies:
+  flutter:
+    sdk: flutter
 
-      - name: "Analyze Flutter project"
-        script: |
-          flutter analyze
+  http: ^1.3.0
+  flutter_secure_storage: ^9.2.4
+  url_launcher: ^6.3.1
 
-      - name: "Run tests"
-        script: |
-          flutter test
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
 
-      - name: "Build Android APK"
-        script: |
-          flutter build apk --debug --dart-define=SUTOOR_API_URL="$API_URL"
+flutter:
+  uses-material-design: true
 
-    artifacts:
-      - build/app/outputs/flutter-apk/*.apk
-
-  android-release:
-    name: "Sutoor Android - Release AAB"
-    max_build_duration: 60
-    instance_type: mac_mini_m2
-
-    environment:
-      flutter: stable
-      vars:
-        API_URL: "https://sutoor.it.com/api/v1"
-
-    scripts:
-      - name: "Generate Android project"
-        script: |
-          flutter create --platforms=android --org com.sutoor --project-name sutoor .
-
-      - name: "Install dependencies"
-        script: |
-          flutter pub get
-
-      - name: "Analyze and test"
-        script: |
-          flutter analyze
-          flutter test
-
-      - name: "Build Android App Bundle"
-        script: |
-          flutter build appbundle --release --dart-define=SUTOOR_API_URL="$API_URL"
-
-    artifacts:
-      - build/app/outputs/bundle/release/*.aab
-
-  ios-unsigned-check:
-    name: "Sutoor iOS - Unsigned Build"
-    max_build_duration: 90
-    instance_type: mac_mini_m2
-
-    environment:
-      flutter: stable
-      xcode: latest
-      cocoapods: default
-      vars:
-        API_URL: "https://sutoor.it.com/api/v1"
-
-    scripts:
-      - name: "Generate iOS project"
-        script: |
-          flutter create --platforms=ios --org com.sutoor --project-name sutoor .
-
-      - name: "Install Flutter dependencies"
-        script: |
-          flutter pub get
-
-      - name: "Analyze and test"
-        script: |
-          flutter analyze
-          flutter test
-
-      - name: "Install CocoaPods"
-        script: |
-          cd ios
-          pod install
-
-      - name: "Build iOS without signing"
-        script: |
-          flutter build ios --release --no-codesign --dart-define=SUTOOR_API_URL="$API_URL"
-
-    artifacts:
-      - build/ios/iphoneos/Runner.app
+  assets:
+    - assets/images/brand.jpg
+    - assets/images/hero-library.jpg
