@@ -1,119 +1,77 @@
-
-# Sutoor Digital Library
-# Codemagic - Android APK / AAB / iOS
-
+# Sutoor | Build Android test APK, Android release bundle, and unsigned iOS check.
+# All workflows use Mac mini M2 instead of Linux x2 (not available on this account).
 workflows:
   android-test:
     name: "Sutoor Android - Test APK"
     max_build_duration: 60
     instance_type: mac_mini_m2
-
     environment:
       flutter: stable
       vars:
         API_URL: "https://sutoor.it.com/api/v1"
-
     scripts:
-      - name: "Generate Android project"
+      - name: "Create Android host project"
         script: |
-          flutter create \
-            --platforms=android \
-            --org com.sutoor \
-            --project-name sutoor .
-
-      - name: "Install Flutter dependencies"
+          flutter --version
+          flutter create --platforms=android --org com.sutoor --project-name sutoor .
+      - name: "Install packages"
+        script: flutter pub get
+      - name: "Analyze source"
+        script: flutter analyze --no-fatal-infos
+      - name: "Run unit tests"
+        script: flutter test
+      - name: "Build debug APK"
         script: |
-          flutter pub get
-
-      - name: "Analyze Flutter code"
-        script: |
-          flutter analyze --no-fatal-infos
-
-      - name: "Run Flutter tests"
-        script: |
-          flutter test
-
-      - name: "Build Android Debug APK"
-        script: |
-          flutter build apk --debug \
-            --dart-define=SUTOOR_API_URL="$API_URL"
-
+          flutter build apk --debug --dart-define=SUTOOR_API_URL="$API_URL"
     artifacts:
       - build/app/outputs/flutter-apk/*.apk
 
   android-release:
-    name: "Sutoor Android - Release AAB"
+    name: "Sutoor Android - Release AAB (signing required)"
     max_build_duration: 60
     instance_type: mac_mini_m2
-
     environment:
       flutter: stable
       vars:
         API_URL: "https://sutoor.it.com/api/v1"
-
     scripts:
-      - name: "Generate Android project"
-        script: |
-          flutter create \
-            --platforms=android \
-            --org com.sutoor \
-            --project-name sutoor .
-
-      - name: "Install dependencies"
+      - name: "Create Android host project"
+        script: flutter create --platforms=android --org com.sutoor --project-name sutoor .
+      - name: "Install, analyze, test"
         script: |
           flutter pub get
-
-      - name: "Analyze and test"
-        script: |
           flutter analyze --no-fatal-infos
           flutter test
-
-      - name: "Build Release App Bundle"
+      - name: "Build AAB (not Play Store signed)"
         script: |
-          flutter build appbundle --release \
-            --dart-define=SUTOOR_API_URL="$API_URL"
-
+          flutter build appbundle --release --dart-define=SUTOOR_API_URL="$API_URL"
     artifacts:
       - build/app/outputs/bundle/release/*.aab
 
   ios-unsigned-check:
-    name: "Sutoor iOS - Unsigned Build"
+    name: "Sutoor iOS - Unsigned compilation"
     max_build_duration: 90
     instance_type: mac_mini_m2
-
     environment:
       flutter: stable
       xcode: latest
       cocoapods: default
       vars:
         API_URL: "https://sutoor.it.com/api/v1"
-
     scripts:
-      - name: "Generate iOS project"
-        script: |
-          flutter create \
-            --platforms=ios \
-            --org com.sutoor \
-            --project-name sutoor .
-
-      - name: "Install Flutter dependencies"
+      - name: "Create iOS host project"
+        script: flutter create --platforms=ios --org com.sutoor --project-name sutoor .
+      - name: "Install, analyze, test"
         script: |
           flutter pub get
-
-      - name: "Analyze and test"
-        script: |
           flutter analyze --no-fatal-infos
           flutter test
-
       - name: "Install CocoaPods"
         script: |
           cd ios
           pod install
-
-      - name: "Compile iOS without signing"
+      - name: "Build unsigned iOS app"
         script: |
-          flutter build ios --release --no-codesign \
-            --dart-define=SUTOOR_API_URL="$API_URL"
-
+          flutter build ios --release --no-codesign --dart-define=SUTOOR_API_URL="$API_URL"
     artifacts:
       - build/ios/iphoneos/Runner.app

@@ -122,7 +122,6 @@ class _HomePageState extends State<HomePage>{late Future<List<Map<String,dynamic
   LoadList(future:books,builder:(items)=>items.isEmpty?const Center(child:Text('لا توجد كتب منشورة حالياً')):
    BooksGrid(books:items.take(6).toList(),api:widget.api)),
  ]));}
-}
 
 class BooksPage extends StatefulWidget {const BooksPage({super.key,required this.api});final SutoorApi api;@override State<BooksPage> createState()=>_BooksPageState();}
 class _BooksPageState extends State<BooksPage>{String query='';late Future<List<Map<String,dynamic>>> books;
@@ -134,7 +133,6 @@ class _BooksPageState extends State<BooksPage>{String query='';late Future<List<
     child:LoadList(future:books,builder:(items){final filtered=items.where((e)=>[val(e,'title'),val(e,'author'),val(e,'category')]
       .any((v)=>v.toLowerCase().contains(query))).toList();return filtered.isEmpty?const Center(child:Text('لا توجد نتائج')):
       ListView(children:[BooksGrid(books:filtered,api:widget.api)]);}))) ]);}
-}
 
 /// Customer library: only books for which the server confirms reading access.
 /// This is intentionally not a PDF reader; no protected-content endpoint exists yet.
@@ -190,7 +188,6 @@ class _BookDetailsState extends State<BookDetails>{bool checking=false;
   const SizedBox(height:20),Text(val(widget.book,'description','لا يوجد وصف لهذا الكتاب حالياً.'),style:const TextStyle(height:1.9)),
   const SizedBox(height:25),FilledButton.icon(onPressed:checking?null:checkAccess,icon:const Icon(Icons.verified_user_outlined),
     label:Text(checking?'جاري التحقق...':'التحقق من القراءة والتنزيل'))])); }
-}
 
 class PlansPage extends StatefulWidget {const PlansPage({super.key,required this.api,required this.onLogin});final SutoorApi api;final VoidCallback onLogin;
  @override State<PlansPage> createState()=>_PlansPageState();}
@@ -220,7 +217,6 @@ class _PlansPageState extends State<PlansPage>{late Future<List<Map<String,dynam
     const SizedBox(height:6),Text('${val(p,'price_bhd','0')} د.ب',style:const TextStyle(fontSize:30,color:gold,fontWeight:FontWeight.bold)),
     Text('المدة: ${val(p,'duration_days')} يوم'),const SizedBox(height:12),Text(val(p,'description')),
     const SizedBox(height:15),FilledButton(onPressed:()=>order(p),child:const Text('طلب الاشتراك'))])))).toList()))]);}
-}
 
 class AccountPage extends StatefulWidget {const AccountPage({super.key,required this.api,required this.signed,required this.onLogin,required this.onLogout});
  final SutoorApi api;final bool signed;final VoidCallback onLogin,onLogout;
