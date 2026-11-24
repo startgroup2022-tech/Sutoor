@@ -47,7 +47,13 @@ class _SutoorAppState extends State<SutoorApp> {
   Future<void> _initialize() async {
     await api.restore();
     if (api.loggedIn) {
-      try { await api.me(); } catch (_) { await api.logout(); }
+      // An offline start or temporary server outage must not erase a valid
+      // session. Only a confirmed HTTP 401 invalidates the saved token.
+      try {
+        await api.me();
+      } on ApiException catch (error) {
+        if (error.statusCode == 401) await api.logout();
+      }
     }
     if (mounted) setState(() { ready = true; signed = api.loggedIn; });
   }
@@ -283,7 +289,7 @@ class BooksGrid extends StatelessWidget {
       padding:const EdgeInsets.symmetric(horizontal:16,vertical:7),
       itemCount:books.length,
       gridDelegate:SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount:count,
-        childAspectRatio: count == 2 ? 0.58 : 0.63,mainAxisSpacing:13,crossAxisSpacing:13),
+        childAspectRatio:count==2?.58:.63,mainAxisSpacing:13,crossAxisSpacing:13),
       itemBuilder:(context,i)=>BookTile(book:books[i],api:api));
   });
 }
