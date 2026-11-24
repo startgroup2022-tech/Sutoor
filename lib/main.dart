@@ -283,7 +283,7 @@ class BooksGrid extends StatelessWidget {
       padding:const EdgeInsets.symmetric(horizontal:16,vertical:7),
       itemCount:books.length,
       gridDelegate:SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount:count,
-        childAspectRatio:count==2?.58:.63,mainAxisSpacing:13,crossAxisSpacing:13),
+        childAspectRatio: count == 2 ? 0.58 : 0.63,mainAxisSpacing:13,crossAxisSpacing:13),
       itemBuilder:(context,i)=>BookTile(book:books[i],api:api));
   });
 }
