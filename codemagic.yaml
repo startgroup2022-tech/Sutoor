@@ -14,8 +14,13 @@ workflows:
         script: |
           flutter --version
           flutter create --platforms=android --org com.sutoor --project-name sutoor .
+          python3 scripts/ensure_android_internet.py
       - name: "Install packages"
         script: flutter pub get
+      - name: "Brand native icons and splash"
+        script: |
+          dart run flutter_launcher_icons
+          dart run flutter_native_splash:create
       - name: "Analyze source"
         script: flutter analyze --no-fatal-infos
       - name: "Run unit tests"
@@ -36,10 +41,14 @@ workflows:
         API_URL: "https://sutoor.it.com/api/v1"
     scripts:
       - name: "Create Android host project"
-        script: flutter create --platforms=android --org com.sutoor --project-name sutoor .
+        script: |
+          flutter create --platforms=android --org com.sutoor --project-name sutoor .
+          python3 scripts/ensure_android_internet.py
       - name: "Install, analyze, test"
         script: |
           flutter pub get
+          dart run flutter_launcher_icons
+          dart run flutter_native_splash:create
           flutter analyze --no-fatal-infos
           flutter test
       - name: "Build AAB (not Play Store signed)"
@@ -64,6 +73,8 @@ workflows:
       - name: "Install, analyze, test"
         script: |
           flutter pub get
+          dart run flutter_launcher_icons
+          dart run flutter_native_splash:create
           flutter analyze --no-fatal-infos
           flutter test
       - name: "Install CocoaPods"
